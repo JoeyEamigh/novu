@@ -17,7 +17,7 @@ export const introQuestions: ListQuestionOptions[] = [
         )
       ) {
         return `Cache invalidation and naming things... \n
-We reccommend trying your project or company name? ;) If you're just curious about Novu, type 'curious'
+We recommend writing your project or company name ;) If you're just curious about Novu, type 'curious'
         `;
       } else if (!input?.trim().length) {
         return `Please enter a valid name. If you're just curious about Novu, type 'curious' ;)`;
