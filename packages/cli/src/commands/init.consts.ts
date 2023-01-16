@@ -16,7 +16,9 @@ export const introQuestions: ListQuestionOptions[] = [
             .replace(/[^\w\s]/gi, '')
         )
       ) {
-        return `Cache invalidation and naming things... We reccommend trying your project or company name? ;) If you're just curious about Novu, type 'curious'`;
+        return `Cache invalidation and naming things... \n
+We reccommend trying your project or company name? ;) If you're just curious about Novu, type 'curious'
+        `;
       } else if (!input?.trim().length) {
         return `Please enter a valid name. If you're just curious about Novu, type 'curious' ;)`;
       }
@@ -71,12 +73,12 @@ export const registerMethodQuestions: ListQuestionOptions[] = [
     message: `Create your account with:`,
     choices: [
       {
-        name: 'With Email & Password',
-        value: 'email',
-      },
-      {
         name: `Sign-up with GitHub`,
         value: 'github',
+      },
+      {
+        name: 'With Email & Password',
+        value: 'email',
       },
     ],
   },
@@ -104,7 +106,7 @@ export const fullNameQuestion: ListQuestionOptions[] = [
   {
     type: 'text',
     name: 'fullName',
-    message: 'Full Name',
+    message: 'Your Full Name',
     validate: (input) => {
       if (!input || input.length < 3) return 'Please write your full name';
 

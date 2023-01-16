@@ -135,22 +135,22 @@ async function handleOnboardingFlow(config: ConfigService) {
       },
     });
 
+    const { accept } = await prompt(termAndPrivacyQuestions);
+
+    analytics.track({
+      identity: { anonymousId },
+      event: AnalyticsEventEnum.TERMS_AND_CONDITIONS_QUESTION,
+      data: {
+        accepted: accept,
+      },
+    });
+
+    if (accept === false) {
+      await analytics.flush();
+      process.exit();
+    }
+
     if (regMethod.value === 'github') {
-      const { accept } = await prompt(termAndPrivacyQuestions);
-
-      analytics.track({
-        identity: { anonymousId },
-        event: AnalyticsEventEnum.TERMS_AND_CONDITIONS_QUESTION,
-        data: {
-          accepted: accept,
-        },
-      });
-
-      if (accept === false) {
-        await analytics.flush();
-        process.exit();
-      }
-
       spinner = ora('Waiting for a brave unicorn to login').start();
       await gitHubOAuth(httpServer, config);
       spinner.stop();
