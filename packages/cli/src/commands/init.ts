@@ -41,7 +41,7 @@ import {
   getEnvironmentApiKeys,
 } from '../api';
 import { AnalyticService, ConfigService, AnalyticsEventEnum, ANALYTICS_SOURCE } from '../services';
-import { signup } from '../api/auth';
+import { signup, updateEmail } from '../api/auth';
 import * as chalk from 'chalk';
 import { privateEmailDomains } from '../constants/domains';
 
@@ -218,13 +218,26 @@ async function handleOnboardingFlow(config: ConfigService) {
     const user = config.getDecodedToken();
 
     if (regMethod.value === 'github' && privateEmailDomains.includes(user.email.split('@')[1])) {
+      spinner.stop();
       const { domain } = await prompt(privateDomainQuestions(user.email));
 
       if (domain === 'updateEmail') {
-        return;
+        let updateErrorForEmail = false;
+        do {
+          const { email } = await prompt(emailQuestion);
+
+          try {
+            await updateEmail({ email });
+          } catch (e) {
+            const error = e.response.data;
+            updateErrorForEmail = true;
+            console.error('Un-expected error ', error);
+          }
+        } while (updateErrorForEmail);
       }
     }
 
+    spinner.start();
     analytics.identify(user);
     analytics.alias({ previousId: anonymousId, userId: user._id });
 

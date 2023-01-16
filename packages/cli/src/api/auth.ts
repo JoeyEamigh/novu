@@ -1,6 +1,6 @@
-import { IEnvironment, SignUpOriginEnum } from '@novu/shared';
-import { get, post } from './api.service';
-import { API_AUTH_SIGNUP } from '../constants';
+import { IUserEntity, SignUpOriginEnum } from '@novu/shared';
+import { get, post, put } from './api.service';
+import { API_AUTH_SIGNUP, API_UPDATE_EMAIL } from '../constants';
 
 export function signup(details: {
   firstName: string;
@@ -10,4 +10,8 @@ export function signup(details: {
   origin: SignUpOriginEnum;
 }): Promise<{ token: string }> {
   return post(API_AUTH_SIGNUP, details);
+}
+
+export function updateEmail(details: { email: string }): Promise<IUserEntity> {
+  return put(API_UPDATE_EMAIL, details);
 }
