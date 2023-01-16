@@ -162,6 +162,14 @@ async function handleOnboardingFlow(config: ConfigService) {
         const { email } = await prompt(emailQuestion);
 
         if (privateEmailDomains.includes(email.split('@')[1])) {
+          analytics.track({
+            identity: { anonymousId },
+            event: AnalyticsEventEnum.PRIVATE_EMAIL_ATTEMPT,
+            data: {
+              method: 'email',
+            },
+          });
+
           const { domain } = await prompt(privateDomainQuestions(email));
 
           if (domain === 'updateEmail') {
@@ -218,12 +226,20 @@ async function handleOnboardingFlow(config: ConfigService) {
     const user = config.getDecodedToken();
 
     if (regMethod.value === 'github' && privateEmailDomains.includes(user.email.split('@')[1])) {
-      spinner.stop();
-      const { domain } = await prompt(privateDomainQuestions(user.email));
+      analytics.track({
+        identity: { anonymousId },
+        event: AnalyticsEventEnum.PRIVATE_EMAIL_ATTEMPT,
+        data: {
+          method: 'github',
+        },
+      });
 
-      if (domain === 'updateEmail') {
-        let updateErrorForEmail = false;
-        do {
+      spinner.stop();
+      let updateErrorForEmail = false;
+      do {
+        const { domain } = await prompt(privateDomainQuestions(user.email));
+
+        if (domain === 'updateEmail') {
           const { email } = await prompt(emailQuestion);
 
           try {
@@ -233,8 +249,8 @@ async function handleOnboardingFlow(config: ConfigService) {
             updateErrorForEmail = true;
             console.error('Un-expected error ', error);
           }
-        } while (updateErrorForEmail);
-      }
+        }
+      } while (updateErrorForEmail);
     }
 
     spinner.start();
