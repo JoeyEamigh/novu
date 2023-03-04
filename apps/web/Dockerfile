@@ -1,4 +1,5 @@
-FROM nikolaik/python-nodejs:python3.10-nodejs16-alpine
+# start builder
+FROM nikolaik/python-nodejs:python3.10-nodejs16-alpine as builder
 
 WORKDIR /usr/src/app
 
@@ -33,4 +34,18 @@ COPY [".eslintrc.js",".prettierrc",".prettierignore", "./"]
 
 RUN NX_DAEMON=false pnpm build:web
 
-CMD [ "pnpm", "start:static:web" ]
+RUN cd apps/web && pnpm envsetup:docker
+# end builder
+
+# start nginx
+FROM nginx:1.21.0-alpine as production
+ENV NODE_ENV production
+
+COPY --from=builder /usr/src/app/apps/web/build /usr/share/nginx/html
+
+COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+# end nginx
